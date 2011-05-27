@@ -6,10 +6,6 @@
 // Scale value for the border
 // Based on the type of marker
 #define BORDER_SCALE 1.25
-// Width of the marker used to calculate matrix homography
-#define MARKER_WIDTH 40.0
-#define MARKER_HALF_WIDTH (MARKER_WIDTH/2.0)
-
 
 
 class ofxARToolkitPlus  {
@@ -48,29 +44,46 @@ class ofxARToolkitPlus  {
 	void draw(int x, int y, int width, int height);
 	
 	///////////////////////////////////////////
-	// MATRIX
+	// 3D GEOMETRY
 	///////////////////////////////////////////
 	/* This is where we set the calculated matrix from ARToolkitPlus. 
 	 * Call this once followed by the model matrix */
 	void applyProjectionMatrix();
+	void applyProjectionMatrix(int viewportWidth, int viewportHeight);
 	/* Call this to then draw graphics at the location and orientation of the given marker.
 	 * The matrix has the 0,0 point as the center of the marker. */
 	void applyModelMatrix(int markerIndex);
+	
 	/* Get the ARTK model matrix for the given marker */ 
 	ofxMatrix4x4 getMatrix(int markerIndex);
+	/* Get the ARTK model matrix (in OpenGL order) for the given marker */ 	
+	ofxMatrix4x4 getGLMatrix(int markerIndex);
+	
 	/* Get the homography matrix for the given marker based on the default marker size */ 
 	ofxMatrix4x4 getHomography(int markerIndex);
 	/* Get the homography matrix for the given marker based on four src corner points */ 
 	ofxMatrix4x4 getHomography(int markerIndex, vector<ofPoint> &src);
 
+	/* Get the translation of the camera relative to the marker */
+	ofxVec3f getTranslation(int markerIndex);
+	/* Get the orientation matrix without translation */
+	ofxMatrix4x4 getOrientationMatrix(int markerIndex);
+	/* Load the translation and orientation into the given variables */
+	void getTranslationAndOrientation(int markerIndex, ofxVec3f &translation, ofxMatrix4x4 &orientation);
+	
+	/* Get the camera position relative to the marker */
+	ofxVec3f getCameraPosition(int markerIndex);
+	
 	
 	///////////////////////////////////////////
-	// THRESHOLD
+	// SETTINGS
 	///////////////////////////////////////////
 	/* Set the threshold manually */
 	void setThreshold(int threshold);
 	/* Enables or disables automatic threshold calculation */
 	void activateAutoThreshold(bool state);
+	/* Set the width of the markers to calculate an accurate matrix in real world scale */
+	void setMarkerWidth(float mm);
 
 	///////////////////////////////////////////
 	// MARKER INFO
@@ -83,7 +96,7 @@ class ofxARToolkitPlus  {
 	int getMarkerID(int markerIndex);
 	
 	///////////////////////////////////////////
-	// GEOMETRY
+	// 2D GEOMETRY
 	///////////////////////////////////////////
 	/* Return the center of the detected marker in screen coordinates */
 	ofPoint getDetectedMarkerCenter(int markerIndex);
@@ -107,8 +120,13 @@ class ofxARToolkitPlus  {
 
 	int width, height;
 	bool useBCH;
+	/* Width of the markers in mm (used to calculate matrix homography) */
+	float markerWidth;
+	float halfMarkerWidth;
 	/* Corners of the marker we use to calculate the homography */
 	vector<ofPoint> homoSrc;
+	/* Setup the homography source */
+	void setupHomoSrc();
 	
 	/*
 	 * Homography Functions adapted from:
@@ -221,7 +239,6 @@ class ofxARToolkitPlus  {
 		findHomography(src, dst, homography);
 		return ofxMatrix4x4(homography);
 	}
-
 	
 	
 };

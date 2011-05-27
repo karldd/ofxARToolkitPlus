@@ -11,7 +11,8 @@ The main 'features' are:
 - openFrameworks style setup/update/draw functions
 - Convenience functions for getting 2D marker points like the corners and center
 - Convenience functions for dealing with 3D drawing and applying GL matrices
-- Convenience functions for retrieving a homography matrix
+- Convenience functions for retrieving a homography matrix in both regular and OpenGL formats
+- Get the position and orientation of the camera relative to the marker
 - A well commented example
 - Includes the markers you need to print & a video of markers if you don't want to print
 
