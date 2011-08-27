@@ -4,6 +4,7 @@
 #include "ARToolKitPlus/TrackerMultiMarkerImpl.h"
 
 ARToolKitPlus::TrackerMultiMarker *tracker;
+ARToolKitPlus::ARMultiMarkerInfoT *multiMarker;
 
 class MyLogger : public ARToolKitPlus::Logger
 {
@@ -16,10 +17,12 @@ class MyLogger : public ARToolKitPlus::Logger
 static MyLogger logger;
 
 ofxARToolkitPlus::ofxARToolkitPlus() {
+	multiMarkerLoaded = false;
 }
 
 ofxARToolkitPlus::~ofxARToolkitPlus() {
 	// This must be static so don't delete it when using multiple instances
+	// TODO: Keep count of instances, and delete final one.
 	//if( tracker != NULL ) { delete tracker; }
 }
 
@@ -39,22 +42,24 @@ void ofxARToolkitPlus::setup(int w, int h, string camParamFile, string multiFile
 	useBCH = true;
 	markerWidth = 40.0;
 	halfMarkerWidth = markerWidth/2;
+	c[0] = 0;
+	c[1] = 0;
 	
 	// ----------------------------------  AR TK+ STUFF - ripped from the single marker demo app
 	
     // create a tracker that does:
     //  - 6x6 sized marker images
     //  - samples at a maximum of 6x6
-    //  - works with luminance (gray) images
-    //  - can load a maximum of 10 patterns
-    //  - can detect a maximum of 10 patterns in one image
-	tracker = new ARToolKitPlus::TrackerMultiMarkerImpl<6,6,6, ARToolKitPlus::PIXEL_FORMAT_LUM, 10>(width,height);
+    //  - can load a maximum of 32 patterns
+    //  - can detect a maximum of 32 patterns in one image
+	tracker = new ARToolKitPlus::TrackerMultiMarkerImpl<6,6,6,32,32>(width,height);
 	
 	const char* description = tracker->getDescription();
 	printf("ARToolKitPlus compile-time information:\n%s\n\n", description);
 	
     // set a logger so we can output error messages
     tracker->setLogger(&logger);
+    //  - works with luminance (gray) images
 	tracker->setPixelFormat(ARToolKitPlus::PIXEL_FORMAT_LUM);	
 
 	tracker->setImageProcessingMode(ARToolKitPlus::IMAGE_FULL_RES);
@@ -96,7 +101,9 @@ void ofxARToolkitPlus::setup(int w, int h, string camParamFile, string multiFile
 	//tracker->setMarkerMode(ARToolKitPlus::MARKER_ID_SIMPLE);
 	
 	//tracker->activateVignettingCompensation(true);
-
+	
+	tracker->setUseDetectLite(false);
+	
 	setupHomoSrc();
 	
 }
@@ -151,18 +158,18 @@ void ofxARToolkitPlus::draw(int x, int y, int w, int h) {
 		ofDrawBitmapString(ofToString(marker.id), marker.pos[0], marker.pos[1]);
 		
 		// Draw the outer rectangle
-		ofPoint center(marker.pos[0], marker.pos[1]);
-		ofNoFill();
-		ofSetColor(255, 0, 0 );		
-		ofBeginShape();
-		for (int j=0; j<4; j++) {
-			ofPoint corner(marker.vertex[j][0], marker.vertex[j][1]);
-			corner -= center;
-			corner *= BORDER_SCALE;
-			corner += center;
-			ofVertex(corner.x, corner.y);
-		}
-		ofEndShape(true);
+//		ofPoint center(marker.pos[0], marker.pos[1]);
+//		ofNoFill();
+//		ofSetColor(255, 0, 0 );		
+//		ofBeginShape();
+//		for (int j=0; j<4; j++) {
+//			ofPoint corner(marker.vertex[j][0], marker.vertex[j][1]);
+//			corner -= center;
+//			corner *= BORDER_SCALE;
+//			corner += center;
+//			ofVertex(corner.x, corner.y);
+//		}
+//		ofEndShape(true);
 		
 	}
 	
@@ -190,11 +197,7 @@ void ofxARToolkitPlus::applyModelMatrix(int markerIndex) {
 
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
 	
-	float m34[ 3 ][ 4 ];
-	float c[ 2 ] = { 0.0f, 0.0f };
-	float m[ 16 ]; 
-	
-	tracker->rppGetTransMat( &marker, c, markerWidth, m34 );
+	getTransMat( &marker, c, m34 );
 	
 	// Convert from ARTK matrix to OpenGL format
 	m[0] = m34[0][0];
@@ -225,10 +228,7 @@ void ofxARToolkitPlus::applyModelMatrix(int markerIndex) {
 ofxMatrix4x4 ofxARToolkitPlus::getMatrix(int markerIndex) {
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
 	
-	float m34[ 3 ][ 4 ];
-	float c[ 2 ] = { 0.0f, 0.0f };
-	
-	tracker->rppGetTransMat( &marker, c, markerWidth, m34 );
+	getTransMat( &marker, c, m34 );
 
 	ofxMatrix4x4 matrix(m34[0][0], m34[0][1], m34[0][2], m34[0][3],
 						m34[1][0], m34[1][1], m34[1][2], m34[1][3],
@@ -240,10 +240,7 @@ ofxMatrix4x4 ofxARToolkitPlus::getMatrix(int markerIndex) {
 ofxMatrix4x4 ofxARToolkitPlus::getGLMatrix(int markerIndex) {
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
 	
-	float m34[ 3 ][ 4 ];
-	float c[ 2 ] = { 0.0f, 0.0f };
-	
-	tracker->rppGetTransMat( &marker, c, markerWidth, m34 );
+	getTransMat( &marker, c, m34 );
 
 	// OpenGL Order
 	ofxMatrix4x4 matrix(m34[0][0], m34[1][0], m34[2][0], 0,
@@ -269,10 +266,7 @@ ofxMatrix4x4 ofxARToolkitPlus::getHomography(int markerIndex, vector<ofPoint> &s
 ofxVec3f ofxARToolkitPlus::getTranslation(int markerIndex) {
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
 	
-	float m34[ 3 ][ 4 ];
-	float c[ 2 ] = { 0.0f, 0.0f };
-	
-	tracker->rppGetTransMat( &marker, c, markerWidth, m34 );
+	getTransMat( &marker, c, m34 );
 	
 	ofxVec3f trans(m34[0][3], m34[1][3], m34[2][3]);
 	return trans;
@@ -280,11 +274,8 @@ ofxVec3f ofxARToolkitPlus::getTranslation(int markerIndex) {
 
 ofxMatrix4x4 ofxARToolkitPlus::getOrientationMatrix(int markerIndex) {
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
-	
-	float m34[ 3 ][ 4 ];
-	float c[ 2 ] = { 0.0f, 0.0f };
-	
-	tracker->rppGetTransMat( &marker, c, markerWidth, m34 );
+
+	getTransMat( &marker, c, m34 );
 	
 	ofxMatrix4x4 matrix(m34[0][0], m34[0][1], m34[0][2], 0,
 						m34[1][0], m34[1][1], m34[1][2], 0,
@@ -293,14 +284,23 @@ ofxMatrix4x4 ofxARToolkitPlus::getOrientationMatrix(int markerIndex) {
 	return matrix;
 }
 
+ofxQuaternion ofxARToolkitPlus::getOrientationQuaternion(int markerIndex) {
+	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
+	
+	getTransMat( &marker, c, m34 );
+	
+	ofxMatrix4x4 matrix(m34[0][0], m34[0][1], m34[0][2], 0,
+						m34[1][0], m34[1][1], m34[1][2], 0,
+						m34[2][0], m34[2][1], m34[2][2], 0,
+						0, 0, 0, 1);
+	return matrix.getRotate();
+}
+
 void ofxARToolkitPlus::getTranslationAndOrientation(int markerIndex, ofxVec3f &translation, ofxMatrix4x4 &orientation) {
 	
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
-	
-	float m34[ 3 ][ 4 ];
-	float c[ 2 ] = { 0.0f, 0.0f };
-	
-	tracker->rppGetTransMat( &marker, c, markerWidth, m34 );
+
+	getTransMat( &marker, c, m34 );
 	
 	// Translation
 	translation.set(m34[0][3], m34[1][3], m34[2][3]);
@@ -329,10 +329,66 @@ ofxVec3f ofxARToolkitPlus::getCameraPosition(int markerIndex)  {
 	
 	// Camera Location
 	// Location of the camera relative to the marker
+	// z appears up
 	ofxVec3f loc = negtOrient * trans;
 	
 	return loc;
 }
+
+void ofxARToolkitPlus::getMultiMarkerTranslationAndOrientation(ofxVec3f &translation, ofxMatrix4x4 &orientation) {
+
+	const ARToolKitPlus::ARMultiMarkerInfoT *multiMarkerConst = tracker->getMultiMarkerConfig();
+	if(multiMarkerConst != NULL) {
+		// Create a copy of the ARMultiMarkerInfoT struct
+		ARToolKitPlus::ARMultiMarkerInfoT mm;
+		size_t mmSize = sizeof(ARToolKitPlus::ARMultiMarkerInfoT);
+		memcpy(&mm, multiMarkerConst, mmSize);
+		
+		// Copy and pass in the markers
+		int numberOfMarkers = tracker->getNumDetectedMarkers();
+		ARToolKitPlus::ARMarkerInfo marker[numberOfMarkers];
+		for (int i=0; i<numberOfMarkers; i++) {
+			marker[i] = tracker->getDetectedMarker(i);
+		}
+		float result = tracker->rppMultiGetTransMat(marker, numberOfMarkers, &mm);
+		
+		// Check for error - yes this does occur
+		if(result < 0 || result >= INT_MAX) {
+			tracker->arMultiGetTransMat(marker, numberOfMarkers, &mm);
+			ofLog(OF_LOG_VERBOSE, "RPP failed on multimarker");	
+		} 
+		
+		// Translation
+		translation.set(mm.trans[0][3], mm.trans[1][3], mm.trans[2][3]);		
+		// Orientation
+		orientation.set(mm.trans[0][0], mm.trans[0][1], mm.trans[0][2], 0,
+						mm.trans[1][0], mm.trans[1][1], mm.trans[1][2], 0,
+						mm.trans[2][0], mm.trans[2][1], mm.trans[2][2], 0,
+						0, 0, 0, 1);
+		
+	} else {
+		ofLog(OF_LOG_VERBOSE, "MultiMarkerConfig file NULL");
+	}
+}
+
+bool ofxARToolkitPlus::loadMultiMarkerFile(string filename) {
+
+	string fullFilePath = ofToDataPath(filename);
+	if(multiMarkerLoaded) {
+		tracker->arMultiFreeConfig(multiMarker);		
+	}
+	multiMarker = tracker->arMultiReadConfigFile(fullFilePath.c_str());
+	
+	if(multiMarker==NULL) {
+		multiMarkerLoaded = false;
+		return false;
+	} else {
+		multiMarkerLoaded = true;
+		return true;
+	}
+	
+}
+
 
 //--------------------------------------------------
 void ofxARToolkitPlus::setThreshold(int threshold) {
@@ -455,4 +511,14 @@ void ofxARToolkitPlus::getDetectedMarkerOrderedBorderCorners(int markerIndex, ve
 	}
 }
 
+void ofxARToolkitPlus::getTransMat(ARToolKitPlus::ARMarkerInfo *marker_info, float center[2], float conv[3][4]) {
+	float result = tracker->rppGetTransMat( marker_info, center, markerWidth, conv );
+	
+	// Check for error - yes this does occur
+	if(result < 0 || result >= INT_MAX) {
+		ofLog(OF_LOG_VERBOSE, "RPP failed on marker " + ofToString(marker_info->id));	
+		// Use standard pose estimation
+		tracker->arGetTransMat( marker_info, center, markerWidth, conv );
+	}
+}
 

@@ -2,10 +2,12 @@
 
 #include "ofMain.h"
 #include "ofxMatrix4x4.h"
+#include <ar.h>
 
 // Scale value for the border
 // Based on the type of marker
 #define BORDER_SCALE 1.25
+
 
 
 class ofxARToolkitPlus  {
@@ -59,7 +61,7 @@ class ofxARToolkitPlus  {
 	/* Get the ARTK model matrix (in OpenGL order) for the given marker */ 	
 	ofxMatrix4x4 getGLMatrix(int markerIndex);
 	
-	/* Get the homography matrix for the given marker based on the default marker size */ 
+	/* Get the homography matrix for the given marker based on the marker size */ 
 	ofxMatrix4x4 getHomography(int markerIndex);
 	/* Get the homography matrix for the given marker based on four src corner points */ 
 	ofxMatrix4x4 getHomography(int markerIndex, vector<ofPoint> &src);
@@ -68,12 +70,24 @@ class ofxARToolkitPlus  {
 	ofxVec3f getTranslation(int markerIndex);
 	/* Get the orientation matrix without translation */
 	ofxMatrix4x4 getOrientationMatrix(int markerIndex);
+	/* Get the orientation as a quaternion without translation */	
+	ofxQuaternion getOrientationQuaternion(int markerIndex);
 	/* Load the translation and orientation into the given variables */
 	void getTranslationAndOrientation(int markerIndex, ofxVec3f &translation, ofxMatrix4x4 &orientation);
 	
-	/* Get the camera position relative to the marker */
+	/* Get the camera position relative to the marker 
+	 * Z Axis faces upwards from the marker */
 	ofxVec3f getCameraPosition(int markerIndex);
 	
+	///////////////////////////////////////////
+	// MULTI MARKER
+	///////////////////////////////////////////
+	/* Get the translation of the multi-marker 
+	 * Details on how to create and load a mult-marker file:
+	 * http://www.hitl.washington.edu/artoolkit/documentation/tutorialmulti.htm */
+	void getMultiMarkerTranslationAndOrientation(ofxVec3f &translation, ofxMatrix4x4 &orientation);
+	/* Load a different multi-marker config file - returns true if it loaded (untested) */
+	bool loadMultiMarkerFile(string filename);
 	
 	///////////////////////////////////////////
 	// SETTINGS
@@ -116,17 +130,7 @@ class ofxARToolkitPlus  {
 	void getDetectedMarkerOrderedBorderCorners(int markerIndex, vector<ofPoint> &corners);
 
 
-	protected:
-
-	int width, height;
-	bool useBCH;
-	/* Width of the markers in mm (used to calculate matrix homography) */
-	float markerWidth;
-	float halfMarkerWidth;
-	/* Corners of the marker we use to calculate the homography */
-	vector<ofPoint> homoSrc;
-	/* Setup the homography source */
-	void setupHomoSrc();
+protected:
 	
 	/*
 	 * Homography Functions adapted from:
@@ -226,10 +230,10 @@ class ofxARToolkitPlus  {
 		// gaussian elimination gives the results of the equation system
 		// in the last column of the original matrix.
 		// opengl needs the transposed 4x4 matrix:
-		float aux_H[]={ P[0][8],P[3][8],0,P[6][8], // h11  h21 0 h31
-			P[1][8],P[4][8],0,P[7][8], // h12  h22 0 h32
-			0      ,      0,0,0,       // 0    0   0 0
-			P[2][8],P[5][8],0,1};      // h13  h23 0 h33
+		float aux_H[]={ P[0][8],P[3][8],0,P[6][8],	// h11  h21 0 h31
+						P[1][8],P[4][8],0,P[7][8],	// h12  h22 0 h32
+						0      ,      0,0,0,		// 0    0   0 0
+						P[2][8],P[5][8],0,1};		// h13  h23 0 h33
 		
 		for(int i=0;i<16;i++) homography[i] = aux_H[i];
 	}
@@ -239,7 +243,27 @@ class ofxARToolkitPlus  {
 		findHomography(src, dst, homography);
 		return ofxMatrix4x4(homography);
 	}
+
+	/* Get the transpose matrix, first trying RPP then with standard functions if necessary */
+	void getTransMat(ARToolKitPlus::ARMarkerInfo *marker_info, float center[2], float conv[3][4]);
 	
+	int width, height;
+	bool useBCH;
+	/* Width of the markers in mm (used to calculate matrix homography) */
+	float markerWidth;
+	float halfMarkerWidth;
+	/* Corners of the marker we use to calculate the homography */
+	vector<ofPoint> homoSrc;
+	/* Setup the homography source */
+	void setupHomoSrc();
+	
+	/* Matrix storage */
+	float m34[ 3 ][ 4 ];
+	float c[ 2 ];
+	float m[ 16 ]; 
+	
+	/* If a multi-marker config file has been loaded after initialization */
+	bool multiMarkerLoaded;
 	
 };
 
