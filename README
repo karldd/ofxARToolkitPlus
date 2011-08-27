@@ -13,6 +13,7 @@ The main 'features' are:
 - Convenience functions for dealing with 3D drawing and applying GL matrices
 - Convenience functions for retrieving a homography matrix in both regular and OpenGL formats
 - Get the position and orientation of the camera relative to the marker
+- Use multi-marker setups as described here: http://www.hitl.washington.edu/artoolkit/documentation/tutorialmulti.htm
 - A well commented example
 - Includes the markers you need to print & a video of markers if you don't want to print
 
