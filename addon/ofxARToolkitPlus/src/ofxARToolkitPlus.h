@@ -2,6 +2,8 @@
 
 #include "ofMain.h"
 #include "ofxMatrix4x4.h"
+#include "ofxVec3f.h"
+#include "ofxQuaternion.h"
 #include <ar.h>
 
 // Scale value for the border
