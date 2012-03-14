@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofMatrix4x4.h"
 #include <ar.h>
 
 // Scale value for the border

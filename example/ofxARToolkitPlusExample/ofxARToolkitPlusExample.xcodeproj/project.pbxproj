@@ -183,16 +183,6 @@
 		6A75AFEF1510E87C00CBAF37 /* ofxCvShortImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxCvShortImage.cpp; sourceTree = "<group>"; };
 		6A75AFF01510E87C00CBAF37 /* ofxCvShortImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxCvShortImage.h; sourceTree = "<group>"; };
 		6A75AFF11510E87C00CBAF37 /* ofxOpenCv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxOpenCv.h; sourceTree = "<group>"; };
-		6A75AFF41510E87C00CBAF37 /* ofxMatrix3x3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMatrix3x3.h; sourceTree = "<group>"; };
-		6A75AFF51510E87C00CBAF37 /* ofxMatrix4x4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMatrix4x4.h; sourceTree = "<group>"; };
-		6A75AFF61510E87C00CBAF37 /* ofxPoint2f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxPoint2f.h; sourceTree = "<group>"; };
-		6A75AFF71510E87C00CBAF37 /* ofxPoint3f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxPoint3f.h; sourceTree = "<group>"; };
-		6A75AFF81510E87C00CBAF37 /* ofxPoint4f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxPoint4f.h; sourceTree = "<group>"; };
-		6A75AFF91510E87C00CBAF37 /* ofxQuaternion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxQuaternion.h; sourceTree = "<group>"; };
-		6A75AFFA1510E87C00CBAF37 /* ofxVec2f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxVec2f.h; sourceTree = "<group>"; };
-		6A75AFFB1510E87C00CBAF37 /* ofxVec3f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxVec3f.h; sourceTree = "<group>"; };
-		6A75AFFC1510E87C00CBAF37 /* ofxVec4f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxVec4f.h; sourceTree = "<group>"; };
-		6A75AFFD1510E87C00CBAF37 /* ofxVectorMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxVectorMath.h; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -575,37 +565,10 @@
 			path = src;
 			sourceTree = "<group>";
 		};
-		6A75AFF21510E87C00CBAF37 /* ofxVectorMath */ = {
-			isa = PBXGroup;
-			children = (
-				6A75AFF31510E87C00CBAF37 /* src */,
-			);
-			name = ofxVectorMath;
-			path = ../../../addons/ofxVectorMath;
-			sourceTree = SOURCE_ROOT;
-		};
-		6A75AFF31510E87C00CBAF37 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				6A75AFF41510E87C00CBAF37 /* ofxMatrix3x3.h */,
-				6A75AFF51510E87C00CBAF37 /* ofxMatrix4x4.h */,
-				6A75AFF61510E87C00CBAF37 /* ofxPoint2f.h */,
-				6A75AFF71510E87C00CBAF37 /* ofxPoint3f.h */,
-				6A75AFF81510E87C00CBAF37 /* ofxPoint4f.h */,
-				6A75AFF91510E87C00CBAF37 /* ofxQuaternion.h */,
-				6A75AFFA1510E87C00CBAF37 /* ofxVec2f.h */,
-				6A75AFFB1510E87C00CBAF37 /* ofxVec3f.h */,
-				6A75AFFC1510E87C00CBAF37 /* ofxVec4f.h */,
-				6A75AFFD1510E87C00CBAF37 /* ofxVectorMath.h */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
 				6A75AF871510E87C00CBAF37 /* ofxOpenCv */,
-				6A75AFF21510E87C00CBAF37 /* ofxVectorMath */,
 				6A75AEF91510E80500CBAF37 /* ofxARToolkitPlus */,
 			);
 			name = addons;
