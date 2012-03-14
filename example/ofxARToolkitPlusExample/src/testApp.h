@@ -3,12 +3,12 @@
 
 #include "ofxOpenCv.h"
 #include "ofxARToolkitPlus.h"
-#include "ofxVectorMath.h"
+#include "ofVectorMath.h"
 
 #include "ofMain.h"
 
 // Uncomment this to use a camera instead of a video file
-//#define CAMERA_CONNECTED
+#define CAMERA_CONNECTED
 
 class testApp : public ofBaseApp{
 

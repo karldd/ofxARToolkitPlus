@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxMatrix4x4.h"
+#include "ofMatrix4x4.h"
 #include <ar.h>
 
 // Scale value for the border
@@ -57,27 +57,27 @@ class ofxARToolkitPlus  {
 	void applyModelMatrix(int markerIndex);
 	
 	/* Get the ARTK model matrix for the given marker */ 
-	ofxMatrix4x4 getMatrix(int markerIndex);
+	ofMatrix4x4 getMatrix(int markerIndex);
 	/* Get the ARTK model matrix (in OpenGL order) for the given marker */ 	
-	ofxMatrix4x4 getGLMatrix(int markerIndex);
+	ofMatrix4x4 getGLMatrix(int markerIndex);
 	
 	/* Get the homography matrix for the given marker based on the marker size */ 
-	ofxMatrix4x4 getHomography(int markerIndex);
+	ofMatrix4x4 getHomography(int markerIndex);
 	/* Get the homography matrix for the given marker based on four src corner points */ 
-	ofxMatrix4x4 getHomography(int markerIndex, vector<ofPoint> &src);
+	ofMatrix4x4 getHomography(int markerIndex, vector<ofPoint> &src);
 
 	/* Get the translation of the camera relative to the marker */
-	ofxVec3f getTranslation(int markerIndex);
+	ofVec3f getTranslation(int markerIndex);
 	/* Get the orientation matrix without translation */
-	ofxMatrix4x4 getOrientationMatrix(int markerIndex);
+	ofMatrix4x4 getOrientationMatrix(int markerIndex);
 	/* Get the orientation as a quaternion without translation */	
-	ofxQuaternion getOrientationQuaternion(int markerIndex);
+	ofQuaternion getOrientationQuaternion(int markerIndex);
 	/* Load the translation and orientation into the given variables */
-	void getTranslationAndOrientation(int markerIndex, ofxVec3f &translation, ofxMatrix4x4 &orientation);
+	void getTranslationAndOrientation(int markerIndex, ofVec3f &translation, ofMatrix4x4 &orientation);
 	
 	/* Get the camera position relative to the marker 
 	 * Z Axis faces upwards from the marker */
-	ofxVec3f getCameraPosition(int markerIndex);
+	ofVec3f getCameraPosition(int markerIndex);
 	
 	///////////////////////////////////////////
 	// MULTI MARKER
@@ -85,7 +85,7 @@ class ofxARToolkitPlus  {
 	/* Get the translation of the multi-marker 
 	 * Details on how to create and load a mult-marker file:
 	 * http://www.hitl.washington.edu/artoolkit/documentation/tutorialmulti.htm */
-	void getMultiMarkerTranslationAndOrientation(ofxVec3f &translation, ofxMatrix4x4 &orientation);
+	void getMultiMarkerTranslationAndOrientation(ofVec3f &translation, ofMatrix4x4 &orientation);
 	/* Load a different multi-marker config file - returns true if it loaded (untested) */
 	bool loadMultiMarkerFile(string filename);
 	
@@ -238,10 +238,10 @@ protected:
 		for(int i=0;i<16;i++) homography[i] = aux_H[i];
 	}
 
-	ofxMatrix4x4 findHomography(vector<ofPoint> src, vector<ofPoint> dst){
+	ofMatrix4x4 findHomography(vector<ofPoint> src, vector<ofPoint> dst){
 		float homography[16];
 		findHomography(src, dst, homography);
-		return ofxMatrix4x4(homography);
+		return ofMatrix4x4(homography);
 	}
 
 	/* Get the transpose matrix, first trying RPP then with standard functions if necessary */

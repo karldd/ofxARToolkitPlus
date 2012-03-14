@@ -119,7 +119,7 @@ void testApp::draw(){
 	
 	// Homography
 	// Here we feed in the corners of an image and get back a homography matrix
-	ofxMatrix4x4 homo = artk.getHomography(myIndex, displayImageCorners);
+	ofMatrix4x4 homo = artk.getHomography(myIndex, displayImageCorners);
 	// We apply the matrix and then can draw the image distorted on to the marker
 	ofPushMatrix();
 	glMultMatrixf(homo.getPtr());

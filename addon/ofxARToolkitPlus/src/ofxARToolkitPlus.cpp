@@ -225,78 +225,78 @@ void ofxARToolkitPlus::applyModelMatrix(int markerIndex) {
 	
 }
 
-ofxMatrix4x4 ofxARToolkitPlus::getMatrix(int markerIndex) {
+ofMatrix4x4 ofxARToolkitPlus::getMatrix(int markerIndex) {
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
 	
 	getTransMat( &marker, c, m34 );
 
-	ofxMatrix4x4 matrix(m34[0][0], m34[0][1], m34[0][2], m34[0][3],
+	ofMatrix4x4 matrix(m34[0][0], m34[0][1], m34[0][2], m34[0][3],
 						m34[1][0], m34[1][1], m34[1][2], m34[1][3],
 						m34[2][0], m34[2][1], m34[2][2], m34[2][3],
 						0, 0, 0, 1);
 	return matrix;
 }
 
-ofxMatrix4x4 ofxARToolkitPlus::getGLMatrix(int markerIndex) {
+ofMatrix4x4 ofxARToolkitPlus::getGLMatrix(int markerIndex) {
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
 	
 	getTransMat( &marker, c, m34 );
 
 	// OpenGL Order
-	ofxMatrix4x4 matrix(m34[0][0], m34[1][0], m34[2][0], 0,
+	ofMatrix4x4 matrix(m34[0][0], m34[1][0], m34[2][0], 0,
 						m34[0][1], m34[1][1], m34[2][1], 0,
 						m34[0][2], m34[1][2], m34[2][2], 0,
 						m34[0][3], m34[1][3], m34[2][3], 1);
 	return matrix;
 }
 
-ofxMatrix4x4 ofxARToolkitPlus::getHomography(int markerIndex) {
+ofMatrix4x4 ofxARToolkitPlus::getHomography(int markerIndex) {
 	vector<ofPoint> corners;
 	getDetectedMarkerOrderedBorderCorners(markerIndex, corners);
 	return findHomography(homoSrc, corners);
 }
 
-ofxMatrix4x4 ofxARToolkitPlus::getHomography(int markerIndex, vector<ofPoint> &src) {
+ofMatrix4x4 ofxARToolkitPlus::getHomography(int markerIndex, vector<ofPoint> &src) {
 	vector<ofPoint> corners;
 	getDetectedMarkerOrderedBorderCorners(markerIndex, corners);
 	return findHomography(src, corners);
 }
 
 
-ofxVec3f ofxARToolkitPlus::getTranslation(int markerIndex) {
+ofVec3f ofxARToolkitPlus::getTranslation(int markerIndex) {
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
 	
 	getTransMat( &marker, c, m34 );
 	
-	ofxVec3f trans(m34[0][3], m34[1][3], m34[2][3]);
+	ofVec3f trans(m34[0][3], m34[1][3], m34[2][3]);
 	return trans;
 }
 
-ofxMatrix4x4 ofxARToolkitPlus::getOrientationMatrix(int markerIndex) {
+ofMatrix4x4 ofxARToolkitPlus::getOrientationMatrix(int markerIndex) {
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
 
 	getTransMat( &marker, c, m34 );
 	
-	ofxMatrix4x4 matrix(m34[0][0], m34[0][1], m34[0][2], 0,
+	ofMatrix4x4 matrix(m34[0][0], m34[0][1], m34[0][2], 0,
 						m34[1][0], m34[1][1], m34[1][2], 0,
 						m34[2][0], m34[2][1], m34[2][2], 0,
 						0, 0, 0, 1);
 	return matrix;
 }
 
-ofxQuaternion ofxARToolkitPlus::getOrientationQuaternion(int markerIndex) {
+ofQuaternion ofxARToolkitPlus::getOrientationQuaternion(int markerIndex) {
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
 	
 	getTransMat( &marker, c, m34 );
 	
-	ofxMatrix4x4 matrix(m34[0][0], m34[0][1], m34[0][2], 0,
+	ofMatrix4x4 matrix(m34[0][0], m34[0][1], m34[0][2], 0,
 						m34[1][0], m34[1][1], m34[1][2], 0,
 						m34[2][0], m34[2][1], m34[2][2], 0,
 						0, 0, 0, 1);
 	return matrix.getRotate();
 }
 
-void ofxARToolkitPlus::getTranslationAndOrientation(int markerIndex, ofxVec3f &translation, ofxMatrix4x4 &orientation) {
+void ofxARToolkitPlus::getTranslationAndOrientation(int markerIndex, ofVec3f &translation, ofMatrix4x4 &orientation) {
 	
 	ARToolKitPlus::ARMarkerInfo marker = tracker->getDetectedMarker(markerIndex);
 
@@ -312,30 +312,30 @@ void ofxARToolkitPlus::getTranslationAndOrientation(int markerIndex, ofxVec3f &t
 					0, 0, 0, 1);
 }
 
-ofxVec3f ofxARToolkitPlus::getCameraPosition(int markerIndex)  {
+ofVec3f ofxARToolkitPlus::getCameraPosition(int markerIndex)  {
 
 	// Translation
-	ofxVec3f trans;
+	ofVec3f trans;
 	// Orientation
-	ofxMatrix4x4 orient;
+	ofMatrix4x4 orient;
 	
 	getTranslationAndOrientation(markerIndex, trans, orient);
 	
 	// Transpose of the camera orientation
-	ofxMatrix4x4 tOrient = ofxMatrix4x4::getTransposedOf(orient);
+	ofMatrix4x4 tOrient = ofMatrix4x4::getTransposedOf(orient);
 	// Negative of the transpose
-	ofxMatrix4x4 negtOrient = tOrient;
+	ofMatrix4x4 negtOrient = tOrient;
 	negtOrient.scale(-1, -1, -1);
 	
 	// Camera Location
 	// Location of the camera relative to the marker
 	// z appears up
-	ofxVec3f loc = negtOrient * trans;
+	ofVec3f loc = negtOrient * trans;
 	
 	return loc;
 }
 
-void ofxARToolkitPlus::getMultiMarkerTranslationAndOrientation(ofxVec3f &translation, ofxMatrix4x4 &orientation) {
+void ofxARToolkitPlus::getMultiMarkerTranslationAndOrientation(ofVec3f &translation, ofMatrix4x4 &orientation) {
 
 	const ARToolKitPlus::ARMultiMarkerInfoT *multiMarkerConst = tracker->getMultiMarkerConfig();
 	if(multiMarkerConst != NULL) {

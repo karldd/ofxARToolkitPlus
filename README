@@ -17,7 +17,7 @@ The main 'features' are:
 - A well commented example
 - Includes the markers you need to print & a video of markers if you don't want to print
 
-This has been tested on Mac with OF 006.2. To get it going on Windows/Linux you will need to compile ARToolkitPlus and add the compile library to the lib folder of the addon.
+This has been tested on Mac with OF 007 (Xcode 3.2.6). To get it going on Windows/Linux you will need to compile ARToolkitPlus and add the compile library to the lib folder of the addon.
 
 If you want to set this up in Xcode (rather than work from the example), add the following to your header search paths
 Code:
