@@ -84,15 +84,15 @@ void testApp::update(){
 void testApp::draw(){
 	
 	// Main image
-	ofSetColor(0xffffff);
+	ofSetHexColor(0xffffff);
 	grayImage.draw(0, 0);
-	ofSetColor(0x666666);	
+	ofSetHexColor(0x666666);	
 	ofDrawBitmapString(ofToString(artk.getNumDetectedMarkers()) + " marker(s) found", 10, 20);
 
 	// Threshold image
-	ofSetColor(0xffffff);
+	ofSetHexColor(0xffffff);
 	grayThres.draw(640, 0);
-	ofSetColor(0x666666);	
+	ofSetHexColor(0x666666);	
 	ofDrawBitmapString("Threshold: " + ofToString(threshold), 650, 20);
 	ofDrawBitmapString("Use the Up/Down keys to adjust the threshold", 650, 40);
 
@@ -111,7 +111,7 @@ void testApp::draw(){
 		artk.getDetectedMarkerBorderCorners(myIndex, corners);
 		// Can also get the center like this:
 		// ofPoint center = artk.getDetectedMarkerCenter(myIndex);
-		ofSetColor(0x0000ff);
+		ofSetHexColor(0x0000ff);
 		for(int i=0;i<corners.size();i++) {
 			ofCircle(corners[i].x, corners[i].y, 10);
 		}
@@ -123,7 +123,7 @@ void testApp::draw(){
 	// We apply the matrix and then can draw the image distorted on to the marker
 	ofPushMatrix();
 	glMultMatrixf(homo.getPtr());
-	ofSetColor(0xffffff);
+	ofSetHexColor(0xffffff);
 	displayImage.draw(0, 0);
 	ofPopMatrix();
 	
@@ -145,7 +145,7 @@ void testApp::draw(){
 		// Draw a line from the center out
 		ofNoFill();
 		ofSetLineWidth(5);
-		ofSetColor(0xffffff);
+		ofSetHexColor(0xffffff);
 		glBegin(GL_LINES);
 		glVertex3f(0, 0, 0); 
 		glVertex3f(0, 0, 50);
